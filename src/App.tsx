@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { extractTextFromFile, parseSyllabusText, mergeParsedIntoSyllabus } from './lib/syllabusImport';
 
 // Lista de cursos para o combo box institucional
 const COURSES_LIST = [
@@ -138,7 +139,13 @@ export default function App() {
   const [showResetModal, setShowResetModal] = useState(false);
   const [showLoadModal, setShowLoadModal] = useState(false);
 
+  // Importação de Plano de Ensino existente (PDF/DOCX)
+  const [isImporting, setIsImporting] = useState(false);
+  const [importWarnings, setImportWarnings] = useState(null);
+  const [importError, setImportError] = useState(null);
+
   const fileInputRef = useRef(null);
+  const documentImportRef = useRef(null);
 
   // Calcula a quantidade de temas dinâmica por Unidade de acordo com a Carga Horária Total (Regra de imagem)
   const getThemeCount = (hours) => {
@@ -248,6 +255,23 @@ export default function App() {
         setSyllabus(prev => ({ ...prev, logoUrl: reader.result }));
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  const handleDocumentImport = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setIsImporting(true);
+    try {
+      const text = await extractTextFromFile(file);
+      const { data, warnings } = parseSyllabusText(text);
+      setSyllabus(prev => mergeParsedIntoSyllabus(prev, data));
+      setImportWarnings(warnings);
+    } catch (err) {
+      setImportError(err instanceof Error ? err.message : 'Não foi possível ler o arquivo.');
+    } finally {
+      setIsImporting(false);
+      e.target.value = '';
     }
   };
 
@@ -401,6 +425,51 @@ export default function App() {
         </div>
       )}
 
+      {importWarnings !== null && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full overflow-hidden border border-neutral-200">
+            <div className="bg-[#D0005F] text-white p-4 font-bold">Importação Concluída</div>
+            <div className="p-4 text-sm text-neutral-600 max-h-[50vh] overflow-y-auto">
+              {importWarnings.length === 0 ? (
+                <p>Todos os campos reconhecidos foram preenchidos automaticamente. Revise o formulário antes de salvar ou imprimir.</p>
+              ) : (
+                <>
+                  <p className="mb-2">Documento importado. Alguns pontos precisam de revisão manual:</p>
+                  <ul className="list-disc pl-5 space-y-1">
+                    {importWarnings.map((w, i) => <li key={i}>{w}</li>)}
+                  </ul>
+                </>
+              )}
+            </div>
+            <div className="p-4 bg-neutral-50 flex justify-end border-t border-neutral-100">
+              <button
+                onClick={() => setImportWarnings(null)}
+                className="px-4 py-2 bg-[#D0005F] hover:bg-[#b0004f] text-white rounded text-xs font-semibold transition"
+              >
+                Entendi
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {importError && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full overflow-hidden border border-neutral-200">
+            <div className="bg-rose-700 text-white p-4 font-bold">Erro ao Importar</div>
+            <div className="p-4 text-sm text-neutral-600">{importError}</div>
+            <div className="p-4 bg-neutral-50 flex justify-end border-t border-neutral-100">
+              <button
+                onClick={() => setImportError(null)}
+                className="px-4 py-2 bg-rose-700 hover:bg-rose-800 text-white rounded text-xs font-semibold transition"
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* HEADER DO SISTEMA - Tom Magenta Oficial Afya (#D0005F) */}
       <header className="bg-[#D0005F] text-white p-4 shadow-lg flex flex-wrap justify-between items-center no-print">
         <div className="flex items-center gap-3">
@@ -420,7 +489,22 @@ export default function App() {
           >
             Carregar Modelo Contábeis (66h)
           </button>
-          
+
+          <input
+            type="file"
+            accept=".pdf,.docx"
+            ref={documentImportRef}
+            onChange={handleDocumentImport}
+            className="hidden"
+          />
+          <button
+            onClick={() => documentImportRef.current?.click()}
+            disabled={isImporting}
+            className="px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-rose-300 text-white text-xs font-semibold rounded-lg shadow transition disabled:opacity-60"
+          >
+            {isImporting ? 'Importando...' : 'Importar PDF/DOCX'}
+          </button>
+
           <button
             onClick={() => setActiveTab('edit')}
             className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${activeTab === 'edit' ? 'bg-white text-[#D0005F] shadow' : 'text-white hover:bg-rose-700'}`}
