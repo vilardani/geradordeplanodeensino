@@ -29,7 +29,7 @@ const initialSyllabusData = {
   period: "6º Período",
   semester: "2026/1",
   matrixYear: "2026",
-  logoUrl: "/afya-logo.jpg", // Utilizando a imagem oficial da Afya fornecida
+  logoUrl: `${import.meta.env.BASE_URL}afya-logo.jpg`, // Utilizando a imagem oficial da Afya fornecida
   workload: {
     total: 66,
     theoretical: 33,
@@ -259,7 +259,7 @@ export default function App() {
       period: "",
       semester: "",
       matrixYear: "",
-      logoUrl: "/afya-logo.jpg",
+      logoUrl: `${import.meta.env.BASE_URL}afya-logo.jpg`,
       workload: {
         total: 0,
         theoretical: 0,
@@ -387,7 +387,7 @@ export default function App() {
       <header className="bg-[#D0005F] text-white p-4 shadow-lg flex flex-wrap justify-between items-center no-print">
         <div className="flex items-center gap-3">
           <div className="bg-white p-1 rounded-lg shadow-inner">
-            <img src="/afya-logo.jpg" alt="Afya Logo" className="h-9 object-contain" />
+            <img src={`${import.meta.env.BASE_URL}afya-logo.jpg`} alt="Afya Logo" className="h-9 object-contain" />
           </div>
           <div>
             <h1 className="text-xl font-bold tracking-tight">AfyaPlan</h1>
