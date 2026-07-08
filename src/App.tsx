@@ -409,7 +409,7 @@ export default function App() {
           </div>
           <div>
             <h1 className="text-xl font-bold tracking-tight">AfyaPlan</h1>
-            <p className="text-xs text-rose-100">Padronizador Oficial de Planos de Ensino — Tom Magenta Afya</p>
+            <p className="text-xs text-rose-100">Padronizador Oficial de Planos de Ensino</p>
           </div>
         </div>
 
