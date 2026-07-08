@@ -303,12 +303,18 @@ export default function App() {
   return (
     <div className="min-h-screen bg-neutral-100 text-neutral-800 flex flex-col font-sans print:bg-white print:text-black relative">
       
-      {/* CSS embutido para controle estrito de quebra de páginas em formato A4 real */}
+      {/* CSS embutido para controle estrito de tamanho de papel e quebra de páginas em formato A4 real */}
       <style dangerouslySetInnerHTML={{__html: `
         @media print {
-          body {
+          @page {
+            size: A4;
+            margin: 13mm;
+          }
+          html, body {
             background-color: #ffffff !important;
             color: #000000 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
           .print-container {
             width: 100% !important;
@@ -324,10 +330,22 @@ export default function App() {
             page-break-inside: avoid !important;
             break-inside: avoid !important;
           }
-          .a4-page {
-            box-shadow: none !important;
-            border: none !important;
-            padding: 20px !important;
+          .print-container table {
+            border-collapse: collapse !important;
+          }
+          .print-container tr,
+          .print-container li {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+          }
+          .print-container h3 {
+            page-break-after: avoid !important;
+            break-after: avoid !important;
+          }
+          .print-container p,
+          .print-container li {
+            orphans: 3;
+            widows: 3;
           }
         }
       `}} />
@@ -1073,7 +1091,7 @@ export default function App() {
               </div>
 
               {/* Seção 6 */}
-              <div className="mb-5 break-inside-avoid">
+              <div className="mb-5">
                 <h3 className="text-[11px] font-extrabold uppercase font-sans text-white bg-[#D0005F] px-2 py-1 mb-2 tracking-wide">
                   6. CONTEÚDO PROGRAMÁTICO E DIVISÃO DE TEMAS
                 </h3>
@@ -1122,12 +1140,12 @@ export default function App() {
               </div>
 
               {/* Seção 8 */}
-              <div className="mb-6 break-inside-avoid text-neutral-800">
+              <div className="mb-6 text-neutral-800">
                 <h3 className="text-[11px] font-extrabold uppercase font-sans text-white bg-[#D0005F] px-2 py-1 mb-3 tracking-wide">
                   8. REFERÊNCIAS BIBLIOGRÁFICAS
                 </h3>
 
-                <div className="mb-3">
+                <div className="mb-3 break-inside-avoid">
                   <h4 className="text-[10px] font-bold font-sans uppercase text-neutral-600 mb-1">
                     8.1 Bibliografia Básica (3 Títulos Obrigatórios com Acesso Digital)
                   </h4>
@@ -1145,7 +1163,7 @@ export default function App() {
                   </ul>
                 </div>
 
-                <div className="mb-3">
+                <div className="mb-3 break-inside-avoid">
                   <h4 className="text-[10px] font-bold font-sans uppercase text-neutral-600 mb-1">
                     8.2 Bibliografia Complementar (4 Títulos)
                   </h4>
@@ -1158,7 +1176,7 @@ export default function App() {
                   </ul>
                 </div>
 
-                <div>
+                <div className="break-inside-avoid">
                   <h4 className="text-[10px] font-bold font-sans uppercase text-neutral-600 mb-1">
                     8.3 Materiais Complementares recomendados (2 Artigos/Leituras de Apoio)
                   </h4>
