@@ -1,19 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { extractTextFromFile, parseSyllabusText, mergeParsedIntoSyllabus } from './lib/syllabusImport';
-
-// Lista de cursos para o combo box institucional
-const COURSES_LIST = [
-  "Administração",
-  "Ciências Contábeis",
-  "Engenharia de Software",
-  "Sistemas de Informação",
-  "Direito",
-  "Medicina",
-  "Enfermagem",
-  "Psicologia",
-  "Engenharia Civil",
-  "Engenharia de Produção"
-];
+import { extractTextFromFile, parseSyllabusText, mergeParsedIntoSyllabus, COURSES_LIST } from './lib/syllabusImport';
 
 // Presets de Texto Base da Afya (Magenta institucional)
 const METHODOLOGY_PRESET_AFYA = 
@@ -1053,7 +1039,7 @@ export default function App() {
                     {syllabus.course ? `Curso de Bacharelado em ${syllabus.course}` : "CURSO NÃO SELECIONADO"}
                   </p>
                   <p className="text-base font-extrabold font-sans text-[#D0005F] mt-1.5 tracking-tight uppercase">
-                    PLANO DE ENSINO — PRESENCIAL
+                    PLANO DE ENSINO
                   </p>
                 </div>
                 
