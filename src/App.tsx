@@ -125,19 +125,45 @@ export default function App() {
     return pending;
   };
 
+  // Nome sugerido do arquivo ao salvar/imprimir em PDF: Disciplina_CHTotal_Matriz
+  const buildExportFileName = () => {
+    const sanitize = (value) => (value || '').toString().trim().replace(/[\\/:*?"<>|]+/g, '-').replace(/\s+/g, ' ').trim();
+    const subject = sanitize(syllabus.subject) || 'Disciplina';
+    const ch = syllabus.workload.total || 0;
+    const matrix = sanitize(syllabus.matrixYear) || 'SemMatriz';
+    return `${subject}_${ch}_${matrix}`;
+  };
+
+  // Define o título do documento (usado pelo navegador como nome sugerido do
+  // arquivo ao salvar em PDF) só durante a impressão, restaurando depois.
+  const triggerPrint = () => {
+    const originalTitle = document.title;
+    document.title = buildExportFileName();
+    const restoreTitle = () => {
+      document.title = originalTitle;
+      window.removeEventListener('afterprint', restoreTitle);
+    };
+    window.addEventListener('afterprint', restoreTitle);
+    window.print();
+  };
+
   const handlePrintClick = () => {
     const pending = getPendingPrintFields();
     if (pending.length > 0) {
       setPendingPrintFields(pending);
     } else {
-      window.print();
+      triggerPrint();
     }
   };
 
   // --- Paginação A4 (simulação de quebra de página em mais de uma folha) ---
   // Altura útil de uma página A4 com margem de 13mm (ver @page no CSS abaixo),
-  // em pixels a 96dpi: (297mm - 2 * 13mm) * (96/25.4).
-  const PAGE_CONTENT_HEIGHT_PX = 1024;
+  // em pixels a 96dpi: (297mm - 2 * 13mm) * (96/25.4). Usamos uma margem de
+  // segurança sobre esse valor teórico porque a paginação real do navegador
+  // (que respeita regras de "não quebrar dentro de X") pode encaixar menos
+  // conteúdo por página do que uma simples soma de alturas sugere — sem essa
+  // margem, um bloco pode "sobrar" para uma página extra que não foi prevista.
+  const PAGE_CONTENT_HEIGHT_PX = 800;
   const PAGE_UNIT_KEYS = [
     'section1', 'section2', 'section3', 'section4', 'section5',
     'section6', 'section7', 'section8-1', 'section8-2', 'section8-3'
@@ -467,7 +493,7 @@ export default function App() {
               <button
                 onClick={() => {
                   setPendingPrintFields(null);
-                  setTimeout(() => window.print(), 50);
+                  setTimeout(() => triggerPrint(), 50);
                 }}
                 className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded text-xs font-semibold transition"
               >
