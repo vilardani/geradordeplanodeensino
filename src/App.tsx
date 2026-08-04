@@ -1093,23 +1093,6 @@ export default function App() {
                 </div>
               </div>
 
-              {}
-              {/* ASSINATURAS */}
-              <div className="mt-12 pt-6 border-t border-dashed border-neutral-300 break-inside-avoid">
-                <div className="grid grid-cols-2 gap-8 text-center text-[11px] font-sans">
-                  <div>
-                    <div className="w-[80%] mx-auto border-b border-neutral-500 mb-1.5"></div>
-                    <p className="font-bold text-neutral-800">Docente Responsável</p>
-                    <p className="text-[9px] text-neutral-500 uppercase">Assinatura Professor(a)</p>
-                  </div>
-                  <div>
-                    <div className="w-[80%] mx-auto border-b border-neutral-500 mb-1.5"></div>
-                    <p className="font-bold text-neutral-800">Aprovação de Colegiado</p>
-                    <p className="text-[9px] text-neutral-500 uppercase">Coordenação do Curso</p>
-                  </div>
-                </div>
-              </div>
-
             </div>
 
           </div>
