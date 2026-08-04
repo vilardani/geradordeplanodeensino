@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { extractTextFromFile, parseSyllabusText, mergeParsedIntoSyllabus, COURSES_LIST } from './lib/syllabusImport';
 
 // Presets de Texto Base da Afya (Magenta institucional)
@@ -77,6 +77,7 @@ export default function App() {
 
   // Modal de confirmação customizado para evitar o uso de window.confirm ou window.alert
   const [showResetModal, setShowResetModal] = useState(false);
+  const [pendingPrintFields, setPendingPrintFields] = useState(null);
 
   // Importação de Plano de Ensino existente (PDF/DOCX)
   const [isImporting, setIsImporting] = useState(false);
@@ -107,6 +108,100 @@ export default function App() {
 
   const isCHValid = calculatedSumCH === syllabus.workload.total;
   const doesCHExceed = calculatedSumCH > syllabus.workload.total;
+
+  // Verifica seções essenciais ainda não preenchidas antes de gerar o PDF
+  const getPendingPrintFields = () => {
+    const pending = [];
+    if (!syllabus.subject.trim()) pending.push('Nome da Disciplina');
+    if (!syllabus.syllabusText.trim()) pending.push('Ementa');
+    if (syllabus.competencies.every(c => !c.trim())) pending.push('Competências');
+    if (syllabus.objectives.every(o => !o.trim())) pending.push('Objetivos');
+    if (!syllabus.methodologyCustom.trim()) pending.push('Metodologia e Estrutura');
+    if (syllabus.programContent.some(u => u.themes.every(t => !t.title.trim()))) pending.push('Temas de alguma Unidade');
+    if (!syllabus.evaluationCustom.trim()) pending.push('Sistema de Avaliação');
+    if (syllabus.basicBibliography.every(b => !b.text.trim())) pending.push('Bibliografia Básica');
+    if (syllabus.complementaryBibliography.every(b => !b.trim())) pending.push('Bibliografia Complementar');
+    if (syllabus.materials.every(m => !m.trim())) pending.push('Materiais Complementares');
+    return pending;
+  };
+
+  const handlePrintClick = () => {
+    const pending = getPendingPrintFields();
+    if (pending.length > 0) {
+      setPendingPrintFields(pending);
+    } else {
+      window.print();
+    }
+  };
+
+  // --- Paginação A4 (simulação de quebra de página em mais de uma folha) ---
+  // Altura útil de uma página A4 com margem de 13mm (ver @page no CSS abaixo),
+  // em pixels a 96dpi: (297mm - 2 * 13mm) * (96/25.4).
+  const PAGE_CONTENT_HEIGHT_PX = 1024;
+  const PAGE_UNIT_KEYS = [
+    'section1', 'section2', 'section3', 'section4', 'section5',
+    'section6', 'section7', 'section8-1', 'section8-2', 'section8-3'
+  ];
+  const unitRefs = useRef(new Map());
+  const registerUnitRef = (key, el) => {
+    if (el) unitRefs.current.set(key, el);
+    else unitRefs.current.delete(key);
+  };
+  const [pagination, setPagination] = useState({ breaks: {}, totalPages: 1 });
+
+  // Mede a altura real de cada seção renderizada e decide onde forçar quebras de
+  // página, garantindo que a contagem total de páginas exibida bata com o PDF
+  // gerado (em vez de apenas estimar onde o navegador quebraria naturalmente).
+  useLayoutEffect(() => {
+    const heights = PAGE_UNIT_KEYS.map(k => unitRefs.current.get(k)?.offsetHeight || 0);
+
+    let used = 0;
+    let page = 1;
+    const breaks = {};
+    heights.forEach((h, i) => {
+      if (used > 0 && used + h > PAGE_CONTENT_HEIGHT_PX) {
+        page += 1;
+        breaks[PAGE_UNIT_KEYS[i]] = { pageNumber: page };
+        used = 0;
+      }
+      if (h > PAGE_CONTENT_HEIGHT_PX) {
+        const totalWithThis = used + h;
+        page += Math.floor(totalWithThis / PAGE_CONTENT_HEIGHT_PX);
+        used = totalWithThis % PAGE_CONTENT_HEIGHT_PX;
+      } else {
+        used += h;
+      }
+    });
+
+    setPagination(prev => {
+      if (prev.totalPages === page && JSON.stringify(prev.breaks) === JSON.stringify(breaks)) return prev;
+      return { breaks, totalPages: page };
+    });
+  }, [syllabus, activeTab, themeCountExpected]);
+
+  const renderPageBreakBefore = (key) => {
+    const breakInfo = pagination.breaks[key];
+    if (!breakInfo) return null;
+    return (
+      <React.Fragment key={`break-${key}`}>
+        <div className="flex justify-end text-[9px] text-neutral-400 font-sans mt-2 mb-1">
+          Página {breakInfo.pageNumber - 1} de {pagination.totalPages}
+        </div>
+        <div style={{ breakBefore: 'page' }} className="pt-3">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="no-print flex-1 border-t-2 border-dashed border-neutral-300"></div>
+            <span className="text-[9px] text-neutral-400 font-sans font-bold px-1">Página {breakInfo.pageNumber} de {pagination.totalPages}</span>
+            <div className="no-print flex-1 border-t-2 border-dashed border-neutral-300"></div>
+          </div>
+          <div className="flex flex-wrap justify-between gap-1 text-[9px] text-neutral-500 font-sans border-b border-neutral-300 pb-1 mb-3">
+            <span className="font-bold">{syllabus.subject || "Disciplina não informada"}</span>
+            <span>Curso: {syllabus.course}</span>
+            <span>Matriz: {syllabus.matrixYear || "—"}</span>
+          </div>
+        </div>
+      </React.Fragment>
+    );
+  };
 
   // Ajusta o array de temas de cada unidade quando o total de horas muda
   useEffect(() => {
@@ -351,6 +446,35 @@ export default function App() {
         </div>
       )}
 
+      {pendingPrintFields !== null && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full overflow-hidden border border-neutral-200">
+            <div className="bg-amber-600 text-white p-4 font-bold">Campos Pendentes</div>
+            <div className="p-4 text-sm text-neutral-600">
+              <p className="mb-2">Os seguintes campos ainda não foram preenchidos:</p>
+              <ul className="list-disc pl-5 space-y-1">
+                {pendingPrintFields.map((field, i) => <li key={i}>{field}</li>)}
+              </ul>
+              <p className="mt-3">Deseja gerar o PDF assim mesmo?</p>
+            </div>
+            <div className="p-4 bg-neutral-50 flex justify-end gap-2 border-t border-neutral-100">
+              <button
+                onClick={() => setPendingPrintFields(null)}
+                className="px-4 py-2 border border-neutral-300 rounded text-xs font-semibold hover:bg-neutral-100 transition text-neutral-700"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => { setPendingPrintFields(null); window.print(); }}
+                className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded text-xs font-semibold transition"
+              >
+                Gerar Assim Mesmo
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* HEADER DO SISTEMA - Tom Magenta Oficial Afya (#D0005F) */}
       <header className="bg-[#D0005F] text-white p-4 shadow-lg flex flex-wrap justify-between items-center no-print">
         <div className="flex items-center gap-3">
@@ -394,7 +518,7 @@ export default function App() {
           </button>
 
           <button
-            onClick={() => window.print()}
+            onClick={handlePrintClick}
             disabled={!isCHValid}
             className={`px-4 py-2 text-sm font-bold rounded-lg flex items-center gap-2 transition shadow ${isCHValid ? 'bg-emerald-600 hover:bg-emerald-500 text-white' : 'bg-neutral-400 text-neutral-200 cursor-not-allowed'}`}
           >
@@ -924,7 +1048,7 @@ export default function App() {
               </div>
 
               {/* Seção 1 */}
-              <div className="mb-5 break-inside-avoid">
+              <div ref={el => registerUnitRef('section1', el)} className="mb-5 break-inside-avoid">
                 <h3 className="text-[11px] font-extrabold uppercase font-sans text-white bg-[#D0005F] px-2 py-1 mb-2 tracking-wide">
                   1. IDENTIFICAÇÃO DA DISCIPLINA
                 </h3>
@@ -966,8 +1090,9 @@ export default function App() {
                 </table>
               </div>
 
+              {renderPageBreakBefore('section2')}
               {/* Seção 2 */}
-              <div className="mb-5 break-inside-avoid text-justify text-neutral-800">
+              <div ref={el => registerUnitRef('section2', el)} className="mb-5 break-inside-avoid text-justify text-neutral-800">
                 <h3 className="text-[11px] font-extrabold uppercase font-sans text-white bg-[#D0005F] px-2 py-1 mb-2 tracking-wide">
                   2. EMENTA DA DISCIPLINA
                 </h3>
@@ -976,8 +1101,9 @@ export default function App() {
                 </p>
               </div>
 
+              {renderPageBreakBefore('section3')}
               {/* Seção 3 */}
-              <div className="mb-5 break-inside-avoid">
+              <div ref={el => registerUnitRef('section3', el)} className="mb-5 break-inside-avoid">
                 <h3 className="text-[11px] font-extrabold uppercase font-sans text-white bg-[#D0005F] px-2 py-1 mb-2 tracking-wide">
                   3. COMPETÊNCIAS A SEREM DESENVOLVIDAS
                 </h3>
@@ -991,8 +1117,9 @@ export default function App() {
                 </ul>
               </div>
 
+              {renderPageBreakBefore('section4')}
               {/* Seção 4 */}
-              <div className="mb-5 break-inside-avoid">
+              <div ref={el => registerUnitRef('section4', el)} className="mb-5 break-inside-avoid">
                 <h3 className="text-[11px] font-extrabold uppercase font-sans text-white bg-[#D0005F] px-2 py-1 mb-2 tracking-wide">
                   4. OBJETIVOS DA DISCIPLINA
                 </h3>
@@ -1006,8 +1133,9 @@ export default function App() {
                 </ul>
               </div>
 
+              {renderPageBreakBefore('section5')}
               {/* Seção 5 */}
-              <div className="mb-5 break-inside-avoid text-justify text-neutral-800">
+              <div ref={el => registerUnitRef('section5', el)} className="mb-5 break-inside-avoid text-justify text-neutral-800">
                 <h3 className="text-[11px] font-extrabold uppercase font-sans text-white bg-[#D0005F] px-2 py-1 mb-2 tracking-wide">
                   5. PROCEDIMENTOS METODOLÓGICOS E ESTRUTURA
                 </h3>
@@ -1016,8 +1144,9 @@ export default function App() {
                 </p>
               </div>
 
+              {renderPageBreakBefore('section6')}
               {/* Seção 6 */}
-              <div className="mb-5">
+              <div ref={el => registerUnitRef('section6', el)} className="mb-5">
                 <h3 className="text-[11px] font-extrabold uppercase font-sans text-white bg-[#D0005F] px-2 py-1 mb-2 tracking-wide">
                   6. CONTEÚDO PROGRAMÁTICO E DIVISÃO DE TEMAS
                 </h3>
@@ -1041,7 +1170,7 @@ export default function App() {
                               <li key={themeIdx} className="font-medium text-neutral-950">
                                 {theme.title || <span className="text-neutral-400 italic">[Tema não preenchido]</span>}
                                 {theme.summary && (
-                                  <div className="font-serif font-normal italic text-[10px] text-neutral-500 mt-0.5">
+                                  <div className="font-serif font-normal italic text-[10px] text-neutral-500 mt-0.5 whitespace-pre-line">
                                     {theme.summary}
                                   </div>
                                 )}
@@ -1049,7 +1178,7 @@ export default function App() {
                             ))}
                           </ol>
                           {unit.summary && (
-                            <div className="mt-2 pt-1 border-t border-neutral-200 text-[10px] text-neutral-500 font-serif italic">
+                            <div className="mt-2 pt-1 border-t border-neutral-200 text-[10px] text-neutral-500 font-serif italic whitespace-pre-line">
                               <strong>Contexto geral:</strong> {unit.summary}
                             </div>
                           )}
@@ -1060,8 +1189,9 @@ export default function App() {
                 </table>
               </div>
 
+              {renderPageBreakBefore('section7')}
               {/* Seção 7 */}
-              <div className="mb-5 break-inside-avoid text-justify text-neutral-800">
+              <div ref={el => registerUnitRef('section7', el)} className="mb-5 break-inside-avoid text-justify text-neutral-800">
                 <h3 className="text-[11px] font-extrabold uppercase font-sans text-white bg-[#D0005F] px-2 py-1 mb-2 tracking-wide">
                   7. CRITÉRIOS DE AVALIAÇÃO DO APRENDIZADO
                 </h3>
@@ -1072,20 +1202,20 @@ export default function App() {
 
               {/* Seção 8 */}
               <div className="mb-6 text-neutral-800">
-                <h3 className="text-[11px] font-extrabold uppercase font-sans text-white bg-[#D0005F] px-2 py-1 mb-3 tracking-wide">
-                  8. REFERÊNCIAS BIBLIOGRÁFICAS
-                </h3>
-
-                <div className="mb-3 break-inside-avoid">
+                {renderPageBreakBefore('section8-1')}
+                <div ref={el => registerUnitRef('section8-1', el)} className="mb-3 break-inside-avoid">
+                  <h3 className="text-[11px] font-extrabold uppercase font-sans text-white bg-[#D0005F] px-2 py-1 mb-3 tracking-wide">
+                    8. REFERÊNCIAS BIBLIOGRÁFICAS
+                  </h3>
                   <h4 className="text-[10px] font-bold font-sans uppercase text-neutral-600 mb-1">
                     8.1 Bibliografia Básica (3 Títulos Obrigatórios com Acesso Digital)
                   </h4>
                   <ul className="list-none pl-0 font-serif text-[11px] space-y-2">
                     {syllabus.basicBibliography.map((bib, idx) => (
                       <li key={idx} className="text-justify pl-4 -indent-4">
-                        <strong>[{idx + 1}]</strong> {bib.text || "—"} 
+                        <strong>[{idx + 1}]</strong> {bib.text || "—"}
                         {bib.link && (
-                          <span className="block text-[9px] text-[#D0005F] font-sans select-all font-medium">
+                          <span className="block text-[9px] text-[#D0005F] font-sans select-all font-medium break-all">
                             Acesso via Minha Biblioteca: <span className="underline">{bib.link}</span>
                           </span>
                         )}
@@ -1094,7 +1224,8 @@ export default function App() {
                   </ul>
                 </div>
 
-                <div className="mb-3 break-inside-avoid">
+                {renderPageBreakBefore('section8-2')}
+                <div ref={el => registerUnitRef('section8-2', el)} className="mb-3 break-inside-avoid">
                   <h4 className="text-[10px] font-bold font-sans uppercase text-neutral-600 mb-1">
                     8.2 Bibliografia Complementar (5 Títulos)
                   </h4>
@@ -1107,19 +1238,26 @@ export default function App() {
                   </ul>
                 </div>
 
-                <div className="break-inside-avoid">
+                {renderPageBreakBefore('section8-3')}
+                <div ref={el => registerUnitRef('section8-3', el)} className="break-inside-avoid">
                   <h4 className="text-[10px] font-bold font-sans uppercase text-neutral-600 mb-1">
                     8.3 Materiais Complementares recomendados (2 Artigos/Leituras de Apoio)
                   </h4>
                   <ul className="list-none pl-0 font-serif text-[11px] space-y-1.5">
                     {syllabus.materials.map((mat, idx) => (
-                      <li key={idx} className="text-justify pl-4 -indent-4">
+                      <li key={idx} className="text-justify pl-4 -indent-4 whitespace-pre-line break-words">
                         <strong>[{idx + 1}]</strong> {mat || "—"}
                       </li>
                     ))}
                   </ul>
                 </div>
               </div>
+
+              {pagination.totalPages > 1 && (
+                <div className="flex justify-end text-[9px] text-neutral-400 font-sans mt-3">
+                  Página {pagination.totalPages} de {pagination.totalPages}
+                </div>
+              )}
 
             </div>
 
