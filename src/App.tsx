@@ -53,7 +53,7 @@ const blankSyllabusData = {
     { text: "", link: "" },
     { text: "", link: "" }
   ],
-  complementaryBibliography: ["", "", "", ""],
+  complementaryBibliography: ["", "", "", "", ""],
   materials: ["", ""]
 };
 
@@ -819,7 +819,7 @@ export default function App() {
                 </div>
 
                 <div className="bg-neutral-50 p-4 border border-neutral-200 rounded-lg">
-                  <h4 className="text-xs font-bold text-[#D0005F] uppercase mb-3">4 Bibliografias Complementares</h4>
+                  <h4 className="text-xs font-bold text-[#D0005F] uppercase mb-3">5 Bibliografias Complementares</h4>
                   <div className="space-y-3">
                     {syllabus.complementaryBibliography.map((bib, idx) => (
                       <div key={idx} className="space-y-1">
@@ -1082,7 +1082,7 @@ export default function App() {
 
                 <div className="mb-3 break-inside-avoid">
                   <h4 className="text-[10px] font-bold font-sans uppercase text-neutral-600 mb-1">
-                    8.2 Bibliografia Complementar (4 Títulos)
+                    8.2 Bibliografia Complementar (5 Títulos)
                   </h4>
                   <ul className="list-none pl-0 font-serif text-[11px] space-y-1.5">
                     {syllabus.complementaryBibliography.map((bib, idx) => (
