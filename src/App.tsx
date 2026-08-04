@@ -32,10 +32,10 @@ const blankSyllabusData = {
   methodologyType: "custom",
   methodologyCustom: "",
   programContent: [
-    { unitName: "UNIDADE 1", themes: ["", ""], summary: "" },
-    { unitName: "UNIDADE 2", themes: ["", ""], summary: "" },
-    { unitName: "UNIDADE 3", themes: ["", ""], summary: "" },
-    { unitName: "UNIDADE 4", themes: ["", ""], summary: "" }
+    { unitName: "UNIDADE 1", themes: [{ title: "", summary: "" }, { title: "", summary: "" }], summary: "" },
+    { unitName: "UNIDADE 2", themes: [{ title: "", summary: "" }, { title: "", summary: "" }], summary: "" },
+    { unitName: "UNIDADE 3", themes: [{ title: "", summary: "" }, { title: "", summary: "" }], summary: "" },
+    { unitName: "UNIDADE 4", themes: [{ title: "", summary: "" }, { title: "", summary: "" }], summary: "" }
   ],
   evaluationType: "custom",
   evaluationCustom: "",
@@ -96,7 +96,7 @@ export default function App() {
         if (currentThemes.length === expected) return unit;
         if (currentThemes.length < expected) {
           while (currentThemes.length < expected) {
-            currentThemes.push("");
+            currentThemes.push({ title: "", summary: "" });
           }
         } else {
           currentThemes.splice(expected);
@@ -142,7 +142,17 @@ export default function App() {
     setSyllabus(prev => {
       const content = [...prev.programContent];
       const themes = [...content[unitIndex].themes];
-      themes[themeIndex] = value;
+      themes[themeIndex] = { ...themes[themeIndex], title: value };
+      content[unitIndex] = { ...content[unitIndex], themes };
+      return { ...prev, programContent: content };
+    });
+  };
+
+  const handleThemeSummaryChange = (unitIndex, themeIndex, value) => {
+    setSyllabus(prev => {
+      const content = [...prev.programContent];
+      const themes = [...content[unitIndex].themes];
+      themes[themeIndex] = { ...themes[themeIndex], summary: value };
       content[unitIndex] = { ...content[unitIndex], themes };
       return { ...prev, programContent: content };
     });
@@ -751,17 +761,26 @@ export default function App() {
                         />
                       </div>
 
-                      <div className="space-y-2">
+                      <div className="space-y-3">
                         <span className="block text-[10px] font-bold text-neutral-500 uppercase">Lista de Temas</span>
                         {unit.themes.map((theme, themeIdx) => (
-                          <div key={themeIdx} className="flex gap-2 items-center">
-                            <span className="text-xs font-bold text-neutral-400">Tema {themeIdx + 1}:</span>
-                            <input 
-                              type="text" 
-                              value={theme}
-                              onChange={(e) => handleThemeChange(unitIdx, themeIdx, e.target.value)}
-                              className="flex-1 p-1.5 border border-neutral-300 rounded text-xs"
-                              placeholder={`Título do Tema ${themeIdx + 1}`}
+                          <div key={themeIdx} className="space-y-1 pb-2 border-b border-neutral-200 last:border-b-0 last:pb-0">
+                            <div className="flex gap-2 items-center">
+                              <span className="text-xs font-bold text-neutral-400">Tema {themeIdx + 1}:</span>
+                              <input
+                                type="text"
+                                value={theme.title}
+                                onChange={(e) => handleThemeChange(unitIdx, themeIdx, e.target.value)}
+                                className="flex-1 p-1.5 border border-neutral-300 rounded text-xs"
+                                placeholder={`Título do Tema ${themeIdx + 1}`}
+                              />
+                            </div>
+                            <textarea
+                              rows="2"
+                              value={theme.summary}
+                              onChange={(e) => handleThemeSummaryChange(unitIdx, themeIdx, e.target.value)}
+                              className="w-full p-1.5 border border-neutral-300 rounded text-xs"
+                              placeholder={`Texto de resumo do tema ${themeIdx + 1}...`}
                             />
                           </div>
                         ))}
@@ -1037,10 +1056,15 @@ export default function App() {
                           {unit.unitName || `UNIDADE ${unitIdx+1}`}
                         </td>
                         <td className="border border-neutral-400 p-2 space-y-2">
-                          <ol className="list-decimal pl-4 font-sans text-neutral-800 space-y-1">
+                          <ol className="list-decimal pl-4 font-sans text-neutral-800 space-y-1.5">
                             {unit.themes.map((theme, themeIdx) => (
                               <li key={themeIdx} className="font-medium text-neutral-950">
-                                {theme || <span className="text-neutral-400 italic">[Tema não preenchido]</span>}
+                                {theme.title || <span className="text-neutral-400 italic">[Tema não preenchido]</span>}
+                                {theme.summary && (
+                                  <div className="font-serif font-normal italic text-[10px] text-neutral-500 mt-0.5">
+                                    {theme.summary}
+                                  </div>
+                                )}
                               </li>
                             ))}
                           </ol>

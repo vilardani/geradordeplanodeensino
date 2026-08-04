@@ -311,7 +311,7 @@ function parseUnits(conteudoText: string) {
       themesSource = body.slice(0, summaryMatch.index);
     }
 
-    const themes = splitIntoBlocks(themesSource);
+    const themes = splitIntoBlocks(themesSource).map(title => ({ title, summary: '' }));
     return { unitName: unit.header.replace(/\s+/g, ' ').trim(), themes, summary };
   });
 }
