@@ -1053,12 +1053,6 @@ export default function App() {
               {/* CABEÇALHO INSTITUCIONAL GERAL (Magenta Afya) */}
               <div className="border-b-2 border-[#D0005F] pb-4 mb-6 flex items-center justify-between gap-4">
                 <div className="flex-1">
-                  <h2 className="text-sm font-bold uppercase tracking-tight font-sans text-neutral-900 leading-tight">
-                    GRUPO AFYA EDUCACIONAL
-                  </h2>
-                  <p className="text-[10px] font-bold text-neutral-500 font-sans mt-0.5 uppercase tracking-wide">
-                    {syllabus.course ? `Curso de Bacharelado em ${syllabus.course}` : "CURSO NÃO SELECIONADO"}
-                  </p>
                   <p className="text-base font-extrabold font-sans text-[#D0005F] mt-1.5 tracking-tight uppercase">
                     PLANO DE ENSINO
                   </p>
