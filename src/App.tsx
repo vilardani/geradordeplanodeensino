@@ -17,8 +17,20 @@ const METHODOLOGY_PRESETS = {
   hibrida: METHODOLOGY_PRESET_HIBRIDA
 };
 
-const EVALUATION_PRESET_AFYA = 
+const EVALUATION_PRESET_PRESENCIAL =
   "Apresentamos a seguir a distribuição dos pontos para cada atividade avaliativa, tendo como nota máxima 100 pontos:\n\n• Atividade elaborada pelo professor: O docente da disciplina elaborará e corrigirá uma atividade (ou conjunto delas) tanto para N1 quanto para N2.\n\n• Avaliações teóricas: O professor responsável pela disciplina elaborará, aplicará e corrigirá as avaliações teóricas tanto para N1 quanto para N2.\n\n• A distribuição desses pontos pode ser realizada em mais de uma atividade e avaliação dentro de cada etapa (N1 e N2).\n\n• Em cada etapa, N1 e N2, a pontuação máxima será de 50 pontos, distribuída entre a(s) atividade(s) e a avaliação teórica.\n\n• A nota semestral será composta pela soma de N1 e N2 (Nota Semestral = N1 + N2), totalizando 100 pontos.\n\n• A Nota semestral (Média) para aprovação é de 70 pontos. E possuirá direito a Exame Final o aluno que obtiver na soma de N1 + N2 acima de 40 pontos.\n\n• O Exame final valerá 100 pontos, e será aplicado apenas para quem não atingiu 70 pontos e somando em N1 + N2 obteve acima de 40 pontos.\n\n• O aluno que já se encontra APROVADO na soma de N1 + N2 NÃO está apto a realização do Exame Final.\n\n• Aluno será considerado APTO ao EXAME FINAL APENAS se obteve acima de 40 PONTOS na soma de N1 + N2.\n\n• O aluno que NÃO obteve 40 pontos na soma de N1 + N2 será REPROVADO sem direito a Exame Final.";
+
+const EVALUATION_PRESET_HIBRIDA =
+  "Para cursos sem TPI:\n\n45 pontos de N1\n• 15 pontos (15%) de atividade\n• 30 pontos (30%) de provas\n\n55 pontos de N2\n• 10 pontos (10%) do Simulado (atividade de autocorreção dentro do Canvas)\n• 5 pontos (5%) de atividade\n• 10 pontos (10%) de atividade\n• 30 pontos (30%) de provas\n\nPara cursos com TPI:\n\n45 pontos de N1\n• 15 pontos (15%) de atividade\n• 30 pontos (30%) de provas\n\n55 pontos de N2\n• 10 pontos (10%) do Simulado (atividade de autocorreção dentro do Canvas)\n• 5 pontos (5%) de atividade\n• 10 pontos (10%) de atividade\n• 20 pontos prova elaborada e corrigida pelo professor (20%)\n• 10 pontos do TPI (10%)";
+
+const EVALUATION_PRESET_ONLINE_ASSINCRONA =
+  "A avaliação da disciplina é composta por atividades realizadas ao longo do período letivo e por uma avaliação presencial. A nota da N1 é formada pelo Roteiro de Atividade 1, com valor de até 20 pontos, referente à Unidade 1, e pelo Roteiro de Atividade 2, com valor de até 25 pontos, contemplando as Unidades 1 e 2. Ambas as atividades são realizadas de forma online, por meio do Canvas, conforme as orientações disponibilizadas na disciplina.\n\nA N2 corresponde à Avaliação Final, com valor de até 55 pontos, abrangendo todo o conteúdo da disciplina. Essa avaliação é realizada presencialmente na unidade ou polo de apoio e exige agendamento prévio obrigatório, que deverá ser realizado dentro dos prazos estabelecidos no calendário acadêmico.\n\nOs estudantes que obtiverem média igual ou superior a 70 pontos estarão aprovados. Aqueles que obtiverem média inferior a 40 pontos estarão reprovados. Já os estudantes que alcançarem média entre 40 e 69,9 pontos deverão realizar o Exame Final, que também é presencial, possui valor de até 100 pontos, contempla todo o conteúdo da disciplina e requer agendamento prévio.\n\nA média da disciplina é calculada pela soma das notas da N1 e da N2 (Média = N1 + N2). Caso seja necessária a realização do Exame Final, a média será recalculada da seguinte forma: Média Final = (Média da disciplina + Nota do Exame Final) ÷ 2. Será considerado aprovado o estudante que obtiver Média Final igual ou superior a 60 pontos. Caso a média final seja inferior a esse valor, será necessário cursar novamente a disciplina.";
+
+const EVALUATION_PRESETS = {
+  presencial: EVALUATION_PRESET_PRESENCIAL,
+  hibrida: EVALUATION_PRESET_HIBRIDA,
+  online_assincrona: EVALUATION_PRESET_ONLINE_ASSINCRONA
+};
 
 // Formulário em branco (estado inicial e também o que "Limpar Campos" restaura)
 const blankSyllabusData = {
@@ -688,12 +700,14 @@ export default function App() {
                         setSyllabus(prev => ({
                           ...prev,
                           evaluationType: val,
-                          evaluationCustom: val === 'afya' ? EVALUATION_PRESET_AFYA : ""
+                          evaluationCustom: EVALUATION_PRESETS[val] || ""
                         }));
                       }}
                       className="p-1 border border-neutral-300 rounded text-[10px] bg-white font-semibold text-[#D0005F]"
                     >
-                      <option value="afya">Padrão Afya (N1 + N2)</option>
+                      <option value="presencial">Padrão Afya - Presencial</option>
+                      <option value="hibrida">Padrão Afya - Híbrida</option>
+                      <option value="online_assincrona">Padrão Afya - Online Assíncrona</option>
                       <option value="custom">Personalizado</option>
                     </select>
                   </div>
