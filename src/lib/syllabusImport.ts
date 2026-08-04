@@ -338,19 +338,13 @@ export function parseSyllabusText(rawText: string): { data: Record<string, any>;
   const subject = findField(headerText, FIELD_DEFS.find(f => f.key === 'subject')!.re);
   if (subject) data.subject = subject;
 
-  const professor = findField(headerText, FIELD_DEFS.find(f => f.key === 'professor')!.re);
-  if (professor) data.professor = professor;
-
+  // "Docente:", "Período:" e "Semestre:" não são mais campos do formulário, mas seus
+  // rótulos permanecem em FIELD_DEFS (usados no STOP_LOOKAHEAD) para que a extração de
+  // outros campos pare corretamente antes deles quando aparecem na mesma linha do PDF.
   const courseRaw = findField(headerText, FIELD_DEFS.find(f => f.key === 'course')!.re);
   const courseMatch = matchCourse(courseRaw);
   if (courseMatch.value) data.course = courseMatch.value;
   if (courseMatch.warning) warnings.push(courseMatch.warning);
-
-  const period = findField(headerText, FIELD_DEFS.find(f => f.key === 'period')!.re);
-  if (period) data.period = period;
-
-  const semester = findField(headerText, FIELD_DEFS.find(f => f.key === 'semester')!.re);
-  if (semester) data.semester = semester;
 
   const matrixYear = findField(headerText, FIELD_DEFS.find(f => f.key === 'matrixYear')!.re);
   if (matrixYear) data.matrixYear = matrixYear;
@@ -441,7 +435,6 @@ export function parseSyllabusText(rawText: string): { data: Record<string, any>;
   }
 
   if (!subject) warnings.push('Não localizei o nome da disciplina — preencha manualmente.');
-  if (!professor) warnings.push('Não localizei o nome do(a) docente — preencha manualmente.');
   if (!courseRaw) warnings.push('Não localizei o curso — selecione manualmente.');
   if (!sections.ementa) warnings.push('Não localizei a seção EMENTA.');
 
@@ -450,7 +443,7 @@ export function parseSyllabusText(rawText: string): { data: Record<string, any>;
 
 export function mergeParsedIntoSyllabus(prev: Record<string, any>, parsed: Record<string, any>): Record<string, any> {
   const next: Record<string, any> = { ...prev };
-  for (const key of ['course', 'subject', 'professor', 'period', 'semester', 'matrixYear', 'syllabusText', 'methodologyCustom', 'evaluationCustom']) {
+  for (const key of ['course', 'subject', 'matrixYear', 'syllabusText', 'methodologyCustom', 'evaluationCustom']) {
     if (parsed[key]) next[key] = parsed[key];
   }
   if (parsed.methodologyCustom) next.methodologyType = 'custom';

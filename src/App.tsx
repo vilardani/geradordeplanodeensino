@@ -12,9 +12,6 @@ const EVALUATION_PRESET_AFYA =
 const blankSyllabusData = {
   course: COURSES_LIST[0],
   subject: "",
-  professor: "",
-  period: "",
-  semester: "",
   matrixYear: "",
   logoUrl: `${import.meta.env.BASE_URL}afya-logo.jpg`,
   workload: {
@@ -485,39 +482,6 @@ export default function App() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-neutral-600 mb-1">Período Letivo</label>
-                    <input 
-                      type="text" 
-                      value={syllabus.period}
-                      onChange={(e) => handleChange('period', e.target.value)}
-                      placeholder="Ex: 6º Período"
-                      className="w-full p-2 border border-neutral-300 rounded text-xs"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-neutral-600 mb-1">Docente Responsável</label>
-                    <input 
-                      type="text" 
-                      value={syllabus.professor}
-                      onChange={(e) => handleChange('professor', e.target.value)}
-                      placeholder="Ex: Prof. Silva"
-                      className="w-full p-2 border border-neutral-300 rounded text-xs"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-neutral-600 mb-1">Semestre</label>
-                    <input 
-                      type="text" 
-                      value={syllabus.semester}
-                      onChange={(e) => handleChange('semester', e.target.value)}
-                      placeholder="Ex: 2026/1"
-                      className="w-full p-2 border border-neutral-300 rounded text-xs"
-                    />
-                  </div>
-
-                  <div>
                     <label className="block text-xs font-bold text-neutral-600 mb-1">Matriz Curricular</label>
                     <input 
                       type="text" 
@@ -946,21 +910,9 @@ export default function App() {
                       </td>
                     </tr>
                     <tr>
-                      <td className="border border-neutral-400 p-1.5 font-bold bg-neutral-50 w-1/4 text-neutral-700">Docente Responsável:</td>
-                      <td className="border border-neutral-400 p-1.5 font-medium text-neutral-950" colSpan="3">
-                        {syllabus.professor || "—"}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="border border-neutral-400 p-1.5 font-bold bg-neutral-50 text-neutral-700">Curso:</td>
-                      <td className="border border-neutral-400 p-1.5 text-neutral-950">{syllabus.course}</td>
-                      <td className="border border-neutral-400 p-1.5 font-bold bg-neutral-50 w-1/5 text-neutral-700">Período:</td>
-                      <td className="border border-neutral-400 p-1.5 text-neutral-950">{syllabus.period || "—"}</td>
-                    </tr>
-                    <tr>
-                      <td className="border border-neutral-400 p-1.5 font-bold bg-neutral-50 text-neutral-700">Semestre:</td>
-                      <td className="border border-neutral-400 p-1.5 text-neutral-950">{syllabus.semester || "—"}</td>
-                      <td className="border border-neutral-400 p-1.5 font-bold bg-neutral-50 text-neutral-700">Matriz Curricular:</td>
+                      <td className="border border-neutral-400 p-1.5 font-bold bg-neutral-50 w-1/4 text-neutral-700">Curso:</td>
+                      <td className="border border-neutral-400 p-1.5 text-neutral-950" colSpan="1">{syllabus.course}</td>
+                      <td className="border border-neutral-400 p-1.5 font-bold bg-neutral-50 w-1/5 text-neutral-700">Matriz Curricular:</td>
                       <td className="border border-neutral-400 p-1.5 text-neutral-950">{syllabus.matrixYear || "—"}</td>
                     </tr>
                     <tr>
@@ -1147,7 +1099,7 @@ export default function App() {
                 <div className="grid grid-cols-2 gap-8 text-center text-[11px] font-sans">
                   <div>
                     <div className="w-[80%] mx-auto border-b border-neutral-500 mb-1.5"></div>
-                    <p className="font-bold text-neutral-800">{syllabus.professor || "Docente Responsável"}</p>
+                    <p className="font-bold text-neutral-800">Docente Responsável</p>
                     <p className="text-[9px] text-neutral-500 uppercase">Assinatura Professor(a)</p>
                   </div>
                   <div>
