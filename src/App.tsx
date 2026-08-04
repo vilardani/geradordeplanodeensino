@@ -14,8 +14,8 @@ const initialSyllabusData = {
   subject: "ANÁLISE DAS DEMONSTRAÇÕES CONTÁBEIS",
   professor: "Profª. Dra. Mariana Mendonça de Souza",
   period: "6º Período",
-  semester: "2026/1",
-  matrixYear: "2026",
+  semester: "2027/1",
+  matrixYear: "2027",
   logoUrl: `${import.meta.env.BASE_URL}afya-logo.jpg`, // Utilizando a imagem oficial da Afya fornecida
   workload: {
     total: 66,
