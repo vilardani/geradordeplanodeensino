@@ -487,7 +487,7 @@ export default function App() {
                       type="text" 
                       value={syllabus.matrixYear}
                       onChange={(e) => handleChange('matrixYear', e.target.value)}
-                      placeholder="Ex: 2026"
+                      placeholder="Ex: 2027"
                       className="w-full p-2 border border-neutral-300 rounded text-xs"
                     />
                   </div>
