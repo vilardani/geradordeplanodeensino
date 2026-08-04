@@ -2,8 +2,20 @@ import React, { useState, useEffect, useRef } from 'react';
 import { extractTextFromFile, parseSyllabusText, mergeParsedIntoSyllabus, COURSES_LIST } from './lib/syllabusImport';
 
 // Presets de Texto Base da Afya (Magenta institucional)
-const METHODOLOGY_PRESET_AFYA = 
+const METHODOLOGY_PRESET_PRESENCIAL =
   "Todas as disciplinas presenciais do Grupo Afya Educacional são estruturalmente iguais, possuindo 22 (vinte e duas) semanas, sendo 20 (vinte) de conteúdo e 2 (duas) de aplicação de avaliações. O professor da disciplina é responsável pelo conteúdo, seguindo o plano de ensino proposto. O professor da disciplina é responsável pela elaboração, aplicação e correção das avaliações teóricas e das atividades com uso de metodologias ativas.";
+
+const METHODOLOGY_PRESET_ONLINE_ASSINCRONA =
+  "Uma disciplina online assíncrona é caracterizada por possuir toda a sua oferta online, de modo que todo o conteúdo está produzido e disponível para o aluno no Ambiente Virtual de Aprendizagem (AVA) podendo ser acessado no tempo que o aluno se programar para estudar. Mesmo tratando-se de uma disciplina, conceitualmente, assíncrona, o Grupo Afya Educacional oferece \"Aulas ao Vivo\" com o professor tutor da disciplina, nas quais os estudantes têm a oportunidade de sanar dúvidas do conteúdo, além de interagir com o tutor e demais colegas. Com isso, há uma proximidade maior e melhor relação tutor-acadêmico. Todas as disciplinas online assíncronas do Grupo Afya Educacional são estruturalmente iguais, divididas em 04 unidades de aprendizagem. Cada semana possui um arquivo com o conteúdo e uma videoaula. Também serão realizados 2 roteiros de atividades, a serem entregues pelos estudantes. A cada período de 15 (quinze) dias, é realizado um encontro síncrono com a proposta de analisar temas referentes as unidades de aprendizagem, 2 unidades por encontro.";
+
+const METHODOLOGY_PRESET_HIBRIDA =
+  "A disciplina híbrida é a junção do e-learning com o presencial. Ela é caracterizada por possuir um conteúdo (produzido por um professor conteudista do Grupo AFYA) disponibilizado no Ambiente Virtual de Aprendizagem (AVA) que dá base teórica ao acadêmico antes deste ir para o momento presencial, trabalhando com o conceito de sala de aula invertida. Todas as disciplinas híbridas do Grupo Afya Educacional são estruturalmente iguais, possuindo 22 (vinte e duas) semanas de conteúdo divididas em 4 (quatro) módulos. Cada semana possui um arquivo com o conteúdo. Dentro do conteúdo da semana, também se tem uma estrutura padrão de aula, contendo: Apresentação, Conteúdo, Você Sabia?, Sintetizando, Atividade e Referências.";
+
+const METHODOLOGY_PRESETS = {
+  presencial: METHODOLOGY_PRESET_PRESENCIAL,
+  online_assincrona: METHODOLOGY_PRESET_ONLINE_ASSINCRONA,
+  hibrida: METHODOLOGY_PRESET_HIBRIDA
+};
 
 const EVALUATION_PRESET_AFYA = 
   "Apresentamos a seguir a distribuição dos pontos para cada atividade avaliativa, tendo como nota máxima 100 pontos:\n\n• Atividade elaborada pelo professor: O docente da disciplina elaborará e corrigirá uma atividade (ou conjunto delas) tanto para N1 quanto para N2.\n\n• Avaliações teóricas: O professor responsável pela disciplina elaborará, aplicará e corrigirá as avaliações teóricas tanto para N1 quanto para N2.\n\n• A distribuição desses pontos pode ser realizada em mais de uma atividade e avaliação dentro de cada etapa (N1 e N2).\n\n• Em cada etapa, N1 e N2, a pontuação máxima será de 50 pontos, distribuída entre a(s) atividade(s) e a avaliação teórica.\n\n• A nota semestral será composta pela soma de N1 e N2 (Nota Semestral = N1 + N2), totalizando 100 pontos.\n\n• A Nota semestral (Média) para aprovação é de 70 pontos. E possuirá direito a Exame Final o aluno que obtiver na soma de N1 + N2 acima de 40 pontos.\n\n• O Exame final valerá 100 pontos, e será aplicado apenas para quem não atingiu 70 pontos e somando em N1 + N2 obteve acima de 40 pontos.\n\n• O aluno que já se encontra APROVADO na soma de N1 + N2 NÃO está apto a realização do Exame Final.\n\n• Aluno será considerado APTO ao EXAME FINAL APENAS se obteve acima de 40 PONTOS na soma de N1 + N2.\n\n• O aluno que NÃO obteve 40 pontos na soma de N1 + N2 será REPROVADO sem direito a Exame Final.";
@@ -646,12 +658,14 @@ export default function App() {
                         setSyllabus(prev => ({
                           ...prev,
                           methodologyType: val,
-                          methodologyCustom: val === 'afya' ? METHODOLOGY_PRESET_AFYA : ""
+                          methodologyCustom: METHODOLOGY_PRESETS[val] || ""
                         }));
                       }}
                       className="p-1 border border-neutral-300 rounded text-[10px] bg-white font-semibold text-[#D0005F]"
                     >
-                      <option value="afya">Padrão Afya (22 Semanas)</option>
+                      <option value="presencial">Padrão Afya - Presencial</option>
+                      <option value="online_assincrona">Padrão Afya - Online Assíncrona</option>
+                      <option value="hibrida">Padrão Afya - Híbrida</option>
                       <option value="custom">Personalizado</option>
                     </select>
                   </div>
