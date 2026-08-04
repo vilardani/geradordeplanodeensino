@@ -465,7 +465,10 @@ export default function App() {
                 Cancelar
               </button>
               <button
-                onClick={() => { setPendingPrintFields(null); window.print(); }}
+                onClick={() => {
+                  setPendingPrintFields(null);
+                  setTimeout(() => window.print(), 50);
+                }}
                 className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded text-xs font-semibold transition"
               >
                 Gerar Assim Mesmo
