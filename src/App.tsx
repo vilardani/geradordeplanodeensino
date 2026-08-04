@@ -8,122 +8,54 @@ const METHODOLOGY_PRESET_AFYA =
 const EVALUATION_PRESET_AFYA = 
   "Apresentamos a seguir a distribuição dos pontos para cada atividade avaliativa, tendo como nota máxima 100 pontos:\n\n• Atividade elaborada pelo professor: O docente da disciplina elaborará e corrigirá uma atividade (ou conjunto delas) tanto para N1 quanto para N2.\n\n• Avaliações teóricas: O professor responsável pela disciplina elaborará, aplicará e corrigirá as avaliações teóricas tanto para N1 quanto para N2.\n\n• A distribuição desses pontos pode ser realizada em mais de uma atividade e avaliação dentro de cada etapa (N1 e N2).\n\n• Em cada etapa, N1 e N2, a pontuação máxima será de 50 pontos, distribuída entre a(s) atividade(s) e a avaliação teórica.\n\n• A nota semestral será composta pela soma de N1 e N2 (Nota Semestral = N1 + N2), totalizando 100 pontos.\n\n• A Nota semestral (Média) para aprovação é de 70 pontos. E possuirá direito a Exame Final o aluno que obtiver na soma de N1 + N2 acima de 40 pontos.\n\n• O Exame final valerá 100 pontos, e será aplicado apenas para quem não atingiu 70 pontos e somando em N1 + N2 obteve acima de 40 pontos.\n\n• O aluno que já se encontra APROVADO na soma de N1 + N2 NÃO está apto a realização do Exame Final.\n\n• Aluno será considerado APTO ao EXAME FINAL APENAS se obteve acima de 40 PONTOS na soma de N1 + N2.\n\n• O aluno que NÃO obteve 40 pontos na soma de N1 + N2 será REPROVADO sem direito a Exame Final.";
 
-// Modelo Padrão Inicial (Totalmente preenchido baseado no PDF da Afya de 'Análise das Demonstrações Contábeis')
-const initialSyllabusData = {
-  course: "Ciências Contábeis",
-  subject: "ANÁLISE DAS DEMONSTRAÇÕES CONTÁBEIS",
-  professor: "Profª. Dra. Mariana Mendonça de Souza",
-  period: "6º Período",
-  semester: "2027/1",
-  matrixYear: "2027",
-  logoUrl: `${import.meta.env.BASE_URL}afya-logo.jpg`, // Utilizando a imagem oficial da Afya fornecida
+// Formulário em branco (estado inicial e também o que "Limpar Campos" restaura)
+const blankSyllabusData = {
+  course: COURSES_LIST[0],
+  subject: "",
+  professor: "",
+  period: "",
+  semester: "",
+  matrixYear: "",
+  logoUrl: `${import.meta.env.BASE_URL}afya-logo.jpg`,
   workload: {
-    total: 66,
-    theoretical: 33,
-    practical: 33,
+    total: 0,
+    theoretical: 0,
+    practical: 0,
     internship: 0,
     onlineAsync: 0,
     onlineSync: 0,
     extension: 0
   },
-  syllabusText: "Estudo das principais ferramentas de análise econômico-financeira aplicadas à gestão empresarial, com ênfase nas análises vertical e horizontal das demonstrações contábeis, possibilitando a identificação de tendências e variações estruturais. São abordados os índices de liquidez, endividamento e rentabilidade como instrumentos essenciais para avaliar a saúde financeira e a eficiência operacional das organizações. A análise dos prazos médios de renovação de estoques, recebimento de vendas e pagamento de compras permite compreender o ciclo operacional e financeiro, fundamentais para a gestão do capital de giro. Complementam-se essa análises com indicadores econômicos e gerenciais como EBITDA, EVA e os graus de alavancagem financeira e operacional, que contribuem para a mensuração da geração de valor e o suporte à tomada de decisões estratégicas.",
-  
-  // Exatamente 5 competências (conforme imagem)
-  competencies: [
-    "Analisar demonstrações financeiras com base em técnicas de análise vertical e horizontal, identificando variações estruturais e tendências ao longo do tempo.",
-    "Interpretar e aplicar indicadores financeiros e econômicos, como índices de liquidez, endividamento, rentabilidade, EBITDA, EVA e alavancagens, para avaliar a saúde financeira e o desempenho organizacional.",
-    "Compreender e calcular os ciclos operacional e financeiro, relacionando-os à gestão eficiente do capital de giro e à sustentabilidade das operações empresariais.",
-    "Utilizar informações contábeis e financeiras na tomada de decisões gerenciais, integrando análises quantitativas e qualitativas para apoiar o planejamento estratégico.",
-    "Desenvolver raciocínio crítico e capacidade analítica na avaliação de resultados financeiros, considerando os impactos das decisões operacionais e financeiras no valor gerado pela empresa."
-  ],
-  
-  // Exatamente 6 objetivos (conforme imagem de regras)
-  objectives: [
-    "Compreender e aplicar técnicas de análise vertical e horizontal das demonstrações financeiras, identificando variações estruturais e tendências relevantes para a gestão empresarial.",
-    "Interpretar e utilizar indicadores financeiros e econômicos, como índices de liquidez, endividamento, rentabilidade, EBITDA, EVA e alavancagens, para avaliar o desempenho e a sustentabilidade das organizações.",
-    "Analisar os ciclos operacional e financeiro, relacionando-os à gestão eficiente do capital de giro e à tomada de decisões estratégicas.",
-    "Avaliar a saúde financeira das empresas por meio de prazos médios de renovação de estoques, recebimento de vendas e pagamento de compras, compreendendo seus impactos na liquidez e no fluxo de caixa.",
-    "Desenvolver a capacidade de análise crítica e tomada de decisão com base em informações contábeis e financeiras, integrando os conhecimentos adquiridos à prática da gestão orçamentária e estratégica.",
-    "" // Opcional / facultativo para preenchimento
-  ],
-  
-  methodologyType: "afya",
-  methodologyCustom: METHODOLOGY_PRESET_AFYA,
-  
-  // Conteúdo Programático Inicializado para 66h (Gera 3 temas por unidade baseado na regra)
+  syllabusText: "",
+  competencies: ["", "", "", "", ""],
+  objectives: ["", "", "", "", "", ""],
+  methodologyType: "custom",
+  methodologyCustom: "",
   programContent: [
-    {
-      unitName: "UNIDADE 1 - FUNDAMENTOS DA ANÁLISE FINANCEIRA",
-      themes: [
-        "Conceitos e objetivos da análise das demonstrações financeiras",
-        "Análise vertical e análise horizontal",
-        "Estrutura e interpretação das demonstrações contábeis (Balanço Patrimonial e DRE)"
-      ],
-      summary: "Introdução à visão de finanças corporativas e a mecânica das análises horizontais e verticais."
-    },
-    {
-      unitName: "UNIDADE 2 - INDICADORES FINANCEIROS",
-      themes: [
-        "Índices de liquidez: corrente, seca e imediata",
-        "Índices de endividamento: composição e cobertura de dívidas",
-        "Índices de rentabilidade: margem, retorno sobre ativos e patrimônio"
-      ],
-      summary: "Estudo dos principais indicadores de liquidez, solvência e eficiência do capital investido."
-    },
-    {
-      unitName: "UNIDADE 3 - GESTÃO DO CAPITAL DE GIRO E CICLOS FINANCEIROS",
-      themes: [
-        "Prazos médios: renovação de estoques, recebimento de vendas e pagamento de compras",
-        "Ciclo operacional e ciclo financeiro",
-        "Análise e dimensionamento do capital de giro"
-      ],
-      summary: "Compreensão dos prazos operacionais médios e seu impacto no caixa diário das corporações."
-    },
-    {
-      unitName: "UNIDADE 4 - ANÁLISES ECONÔMICAS E GERENCIAIS",
-      themes: [
-        "EBITDA e EVA: conceitos, cálculo e interpretação",
-        "Alavancagem financeira e operacional",
-        "Aplicação dos indicadores na tomada de decisão estratégica"
-      ],
-      summary: "Geração de valor corporativo de longo prazo por indicadores econômicos de alta performance."
-    }
+    { unitName: "UNIDADE 1", themes: ["", ""], summary: "" },
+    { unitName: "UNIDADE 2", themes: ["", ""], summary: "" },
+    { unitName: "UNIDADE 3", themes: ["", ""], summary: "" },
+    { unitName: "UNIDADE 4", themes: ["", ""], summary: "" }
   ],
-  
-  evaluationType: "afya",
-  evaluationCustom: EVALUATION_PRESET_AFYA,
-  
-  // Exatamente 3 básicas com link (conforme regras de imagem)
+  evaluationType: "custom",
+  evaluationCustom: "",
   basicBibliography: [
-    { text: "ASSAF NETO, Alexandre. Estrutura e Análise de Balanços: Um Enfoque Econômico-financeiro. 13. ed. Rio de Janeiro: Atlas, 2023.", link: "https://minhabiblioteca.com.br" },
-    { text: "SILVA, Alexandre Alcantara da. Estrutura, Análise e Interpretação das Demonstrações Contábeis. 5. ed. Rio de Janeiro: Atlas, 2017.", link: "https://minhabiblioteca.com.br" },
-    { text: "IUDÍCIBUS, Sérgio de. Análise de Balanços, 11ª edição. Rio de Janeiro: Atlas, 2017.", link: "https://minhabiblioteca.com.br" }
+    { text: "", link: "" },
+    { text: "", link: "" },
+    { text: "", link: "" }
   ],
-  
-  // Exatamente 4 complementares (conforme imagem)
-  complementaryBibliography: [
-    "MARION, José C. Análise das Demonstrações Contábeis. 8. ed. Rio de Janeiro: Atlas, 2019.",
-    "VICECONTI, Paulo; NEVES, Silvério das. Contabilidade avançada e análises das demonstrações financeiras. 18. ed. Rio de Janeiro: Saraiva Uni, 2018.",
-    "MARTINS, Eliseu; MIRANDA, Gilberto J.; DINIZ, Josedilton A. Análise Didática das Demonstrações Contábeis. 4. ed. Rio de Janeiro: Atlas, 2024.",
-    "SILVA, José Pereira da. Gestão e Análise de Risco de Crédito - 9ª edição revista e atualizada. 9. ed. Porto Alegre: +A Educação - Cengage Learning Brasil, 2018."
-  ],
-  
-  // Exatamente 2 materiais complementares (conforme imagem)
-  materials: [
-    "FRANCIELI SIEBENEICHLER, A.; ANDRÉ FEIL, A. Análise Das Demonstrações Contábeis Pelo Método Tradicional, Integrado E Estruturado. Gestão e Desenvolvimento, v. 19, n. 2, p. 76-103, 2022.",
-    "RAPOSO, S. M. da S. Análise das demonstrações contábeis: Um estudo dos indicadores fundamentalistas de uma locadora de automóveis. [s. l.], 2024."
-  ]
+  complementaryBibliography: ["", "", "", ""],
+  materials: ["", ""]
 };
 
 export default function App() {
-  const [syllabus, setSyllabus] = useState(initialSyllabusData);
+  const [syllabus, setSyllabus] = useState(blankSyllabusData);
   const [activeTab, setActiveTab] = useState('edit'); // 'edit' ou 'preview'
   const [activeFormTab, setActiveFormTab] = useState('identificacao');
   const [logoPreview, setLogoPreview] = useState(null);
-  
-  // Modais de confirmação customizados para evitar o uso de window.confirm ou window.alert
+
+  // Modal de confirmação customizado para evitar o uso de window.confirm ou window.alert
   const [showResetModal, setShowResetModal] = useState(false);
-  const [showLoadModal, setShowLoadModal] = useState(false);
 
   // Importação de Plano de Ensino existente (PDF/DOCX)
   const [isImporting, setIsImporting] = useState(false);
@@ -262,52 +194,9 @@ export default function App() {
   };
 
   const executeReset = () => {
-    setSyllabus({
-      course: COURSES_LIST[0],
-      subject: "",
-      professor: "",
-      period: "",
-      semester: "",
-      matrixYear: "",
-      logoUrl: `${import.meta.env.BASE_URL}afya-logo.jpg`,
-      workload: {
-        total: 0,
-        theoretical: 0,
-        practical: 0,
-        internship: 0,
-        onlineAsync: 0,
-        onlineSync: 0,
-        extension: 0
-      },
-      syllabusText: "",
-      competencies: ["", "", "", "", ""],
-      objectives: ["", "", "", "", "", ""],
-      methodologyType: "custom",
-      methodologyCustom: "",
-      programContent: [
-        { unitName: "UNIDADE 1", themes: ["", ""], summary: "" },
-        { unitName: "UNIDADE 2", themes: ["", ""], summary: "" },
-        { unitName: "UNIDADE 3", themes: ["", ""], summary: "" },
-        { unitName: "UNIDADE 4", themes: ["", ""], summary: "" }
-      ],
-      evaluationType: "custom",
-      evaluationCustom: "",
-      basicBibliography: [
-        { text: "", link: "" },
-        { text: "", link: "" },
-        { text: "", link: "" }
-      ],
-      complementaryBibliography: ["", "", "", ""],
-      materials: ["", ""]
-    });
+    setSyllabus(blankSyllabusData);
     setLogoPreview(null);
     setShowResetModal(false);
-  };
-
-  const executeLoadTemplate = () => {
-    setSyllabus(initialSyllabusData);
-    setLogoPreview(null);
-    setShowLoadModal(false);
   };
 
   return (
@@ -386,31 +275,6 @@ export default function App() {
         </div>
       )}
 
-      {showLoadModal && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full overflow-hidden border border-neutral-200">
-            <div className="bg-[#D0005F] text-white p-4 font-bold">Carregar Modelo Oficial</div>
-            <div className="p-4 text-sm text-neutral-600">
-              Deseja carregar o exemplo completo de "Análise das Demonstrações Contábeis" com as regras e dados do Grupo Afya?
-            </div>
-            <div className="p-4 bg-neutral-50 flex justify-end gap-2 border-t border-neutral-100">
-              <button 
-                onClick={() => setShowLoadModal(false)}
-                className="px-4 py-2 border border-neutral-300 rounded text-xs font-semibold hover:bg-neutral-100 transition text-neutral-700"
-              >
-                Cancelar
-              </button>
-              <button 
-                onClick={executeLoadTemplate}
-                className="px-4 py-2 bg-[#D0005F] hover:bg-[#b0004f] text-white rounded text-xs font-semibold transition"
-              >
-                Sim, Carregar Modelo
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {importWarnings !== null && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full overflow-hidden border border-neutral-200">
@@ -469,13 +333,6 @@ export default function App() {
         </div>
 
         <div className="flex items-center gap-3 mt-3 md:mt-0">
-          <button
-            onClick={() => setShowLoadModal(true)}
-            className="px-3 py-1.5 bg-[#a00045] hover:bg-[#800035] border border-rose-400 text-white text-xs font-semibold rounded-lg shadow transition"
-          >
-            Carregar Modelo Contábeis (66h)
-          </button>
-
           <input
             type="file"
             accept=".pdf,.docx"
